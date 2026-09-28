@@ -1,0 +1,216 @@
+{
+  "info": {
+    "_postman_id": "c7a7c99a-4742-46d4-886d-1f235b802403",
+    "name": "Platzi Store API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "56343806",
+    "_collection_link": "https://go.postman.co/collection/56343806-c7a7c99a-4742-46d4-886d-1f235b802403?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "READ products",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response time is less than 600ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(600);\r\n});\r\n\r\npm.test(\"La réponse est un tableau JSON non vide\", function () {\r\n    const responseData = pm.response.json();\r\n    pm.expect(responseData).to.be.an('array').that.is.not.empty;\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "CREATE product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 1. On vérifie d'abord que le serveur a répondu un code 201 Created\r\n\r\n// 2. On récupère la réponse\r\nconst response = pm.response.json();\r\n\r\n// 3. On affiche toujours la réponse brute pour déboguer\r\nconsole.log(\"Réponse complète du serveur :\", response);\r\n\r\n// 4. Si l'ID existe, on le stocke et on l'affiche\r\nif (response && response.id) {\r\n    pm.environment.set(\"productId\", response.id);\r\n    console.log(\"ID du produit bien enregistré :\", response.id);\r\n} else {\r\n    console.error(\"Impossible de trouver l'ID. Vérifie le Body de ta requête !\");\r\n}\r\n\r\npm.test(\"Statut 201 Created - Produit ID: \" + response.id, function () {\r\n    pm.response.to.have.status(201);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Grand 97 Nouveau Produit QA\",\n  \"price\": 10,\n  \"description\": \"Un autre produit 96 créé via tests automatisés Postman\",\n  \"categoryId\": 1,\n  \"images\": [\"https://placeimg.com/640/480/any\"]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "READ the new product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Product ID matches environment variable\", function () {\n    const response = pm.response.json();\n    pm.expect(response.id).to.eql(Number(pm.environment.get(\"productId\")));\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/{{productId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "{{productId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "UPDATE the new product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Produit {{productId}} - Updated {{$randomProductName}} {{randomInt}}\",\r\n  \"price\": 10,\r\n  \"description\": \"Un autre produit 96 créé via tests automatisés Postman\",\r\n  \"categoryId\": 1,\r\n  \"images\": [\"https://placeimg.com/640/480/any\"]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products/{{productId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "{{productId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE the new product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Body matches string\", function () {\r\n    pm.expect(pm.response.text()).to.include(\"true\");\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/{{productId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "{{productId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "READ product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products/{{productId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "{{productId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "id",
+      "value": ""
+    }
+  ]
+}
